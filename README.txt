@@ -134,5 +134,14 @@ Retrieve entry lineage
    ,"53ca9f30-4de6-4661-9e5a-e57bc78a873a"]
 
 
+TODO
+====
 
+The API is terrible and crufty, owing to its lineage as a quick
+prototype. It could use some standardisation and lots of attention.
 
+  * standardise the output? what about retrieving files --- should
+    the output remain a byte stream, or should they be embedded in
+    some other response?
+  * Use HTTP status codes effectively. I think to some extent that's
+    happening, but I'm not entirely certain of this.
