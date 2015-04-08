@@ -1,16 +1,16 @@
-;;;; cl-nebula-www.asd
+;;;; nebula-www.asd
 
 (asdf:defsystem #:nebula-www
-  :description "HTTP front end for nebula"
+  :description "Describe nebula-www here"
   :author "Kyle Isom <kyle@metacircular.net>"
   :license "MIT License"
   :depends-on (#:cl-who
-	       #:log4cl
-	       #:flexi-streams
+               #:log4cl
+               #:flexi-streams
                #:restas
                #:st-json
                #:nebula)
   :serial t
   :components ((:file "package")
-               (:file "cl-nebula-www")))
+               (:file "nebula-www")))
 

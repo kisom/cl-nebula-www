@@ -4,14 +4,15 @@
 
 ;;; "cl-nebula-www" goes here. Hacks and glory await!
 
-(defun startup (&key (port 3000))
-  (restas:debug-mode-on)
+(defun startup (&key (port 3000) debug)
+  (nebula:initialize)
+  (when debug (restas:debug-mode-on))
   (format t "starting up on port ~A~%" port)
   (restas:start '#:nebula-www :port port))
 
-(define-route index-route ("/" :method :get)
+(restas:define-route get-index-route ("/" :method :get)
   (log4cl:log-info "GET /")
-  (with-html-output-to-string (out nil :prologue t :indent t)
+  (who:with-html-output-to-string (out nil :prologue t :indent t)
       (:html
        (:head
         (:title "nebula demo filestore")
@@ -57,46 +58,46 @@
              (:li "proxies an entry and all its parents.")
              (:li (:code "curl /entry/2181203d-7c99-4cf3-8461-f0702565819b/lineage/proxy")))))))))
 
-(define-route post-entry ("/entry" :method :post)
+
+(restas:define-route post-entry-route ("/entry" :method :post)
   (log4cl:log-info "POST /entry")
   (let ((body (hunchentoot:raw-post-data :force-text t)))
-    (setq last-blob body)
     (let ((uuid (upload-blob body)))
       (log4cl:log-info "created entry " uuid)
       uuid)))
 
-(define-route get-entry ("/entry/:uuid" :method :get)
+(restas:define-route get-entry-uuid-route ("/entry/:uuid" :method :get)
   (log4cl:log-info "GET /entry/" uuid)
-  (octets-to-string
+  (flexi-streams:octets-to-string
    (resolve-target uuid)))
 
-(define-route post-entry ("/entry/:uuid" :method :post)
+(restas:define-route post-entry-child-route ("/entry/:uuid" :method :post)
   (log4cl:log-info "POST /entry/" uuid)
   (let ((body (hunchentoot:raw-post-data :force-text t)))
     (let ((created (upload-blob body :parent uuid)))
       (log4cl:log-info "created entry " created)
       created)))
 
-(define-route proxy-entry-route ("/entry/:uuid/proxy" :method :get)
+(restas:define-route post-entry-uuid-proxy-route ("/entry/:uuid/proxy" :method :get)
   (log4cl:log-info "GET /entry/" uuid "/proxy")
   (proxy uuid))
 
-(define-route delete-entry-route ("/entry/:uuid" :method :delete)
+(restas:define-route delete-entry-uuid-route ("/entry/:uuid" :method :delete)
   (log4cl:log-info "DELETE /entry/" uuid)
   (if (remove-entry uuid)
       "OK"
       "failed"))
 
-(define-route get-entry-route ("/entry/:uuid/lineage" :method :get)
+(restas:define-route get-entry-uuid-lineage-route ("/entry/:uuid/lineage" :method :get)
   (log4cl:log-info "GET /entry/" uuid "/lineage")
-  (write-json-to-string
+  (st-json:write-json-to-string
    (entry-history uuid)))
 
-(define-route entry-info-route ("/entry/:uuid/info" :method :get)
+(restas:define-route get-entry-uuid-info-route ("/entry/:uuid/info" :method :get)
   (log4cl:log-info "GET /entry/" uuid "/info")
   (entry-info uuid))
 
-(define-route get-entry-route ("/entry/:uuid/lineage/proxy" :method :get)
+(restas:define-route get-entry-uuid-lineage-proxy-route ("/entry/:uuid/lineage/proxy" :method :get)
   (log4cl:log-info "GET /entry/" uuid "/lineage/proxy")
-  (write-json-to-string
+  (st-json:write-json-to-string
    (proxy-all uuid)))
