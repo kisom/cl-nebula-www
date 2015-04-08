@@ -116,7 +116,8 @@ Retrieve entry lineage
    of parents.
 
    Consider the following sequence:
-   +x A file is uploaded and assigned the ID 53ca9f30-4de6-4661-9e5a-e57bc78a873a
+   + A file is uploaded and assigned the ID 53ca9f30-4de6-4661-9e5a-
+     e57bc78a873a
    + The file is changed and POSTed to
      /entry/53ca9f30-4de6-4661-9e5a-e57bc78a873a, returning the UUID
      9cb205d0-e7e5-4b14-9307-5ab70841786d
