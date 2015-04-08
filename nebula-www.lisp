@@ -62,19 +62,19 @@
 (restas:define-route post-entry-route ("/entry" :method :post)
   (log4cl:log-info "POST /entry")
   (let ((body (hunchentoot:raw-post-data :force-text t)))
-    (let ((uuid (upload-blob body)))
+    (let ((uuid (store body)))
       (log4cl:log-info "created entry " uuid)
       uuid)))
 
 (restas:define-route get-entry-uuid-route ("/entry/:uuid" :method :get)
   (log4cl:log-info "GET /entry/" uuid)
   (flexi-streams:octets-to-string
-   (resolve-target uuid)))
+   (retrieve uuid)))
 
 (restas:define-route post-entry-child-route ("/entry/:uuid" :method :post)
   (log4cl:log-info "POST /entry/" uuid)
   (let ((body (hunchentoot:raw-post-data :force-text t)))
-    (let ((created (upload-blob body :parent uuid)))
+    (let ((created (store body :parent uuid)))
       (log4cl:log-info "created entry " created)
       created)))
 
@@ -84,18 +84,23 @@
 
 (restas:define-route delete-entry-uuid-route ("/entry/:uuid" :method :delete)
   (log4cl:log-info "DELETE /entry/" uuid)
-  (if (remove-entry uuid)
+  (if (expunge uuid)
       "OK"
       "failed"))
 
 (restas:define-route get-entry-uuid-lineage-route ("/entry/:uuid/lineage" :method :get)
   (log4cl:log-info "GET /entry/" uuid "/lineage")
   (st-json:write-json-to-string
-   (entry-history uuid)))
+   (lineage uuid)))
 
 (restas:define-route get-entry-uuid-info-route ("/entry/:uuid/info" :method :get)
   (log4cl:log-info "GET /entry/" uuid "/info")
-  (entry-info uuid))
+  (let ((info (info uuid)))
+    (st-json:write-json-to-string
+     (st-json:jso
+      "id"      (assoc :id info)
+      "created" (assoc :created info)
+      "parent"  (or (assoc :parent info) "")))))
 
 (restas:define-route get-entry-uuid-lineage-proxy-route ("/entry/:uuid/lineage/proxy" :method :get)
   (log4cl:log-info "GET /entry/" uuid "/lineage/proxy")
