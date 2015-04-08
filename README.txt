@@ -23,7 +23,7 @@ Upload new blob
 
    $ cat file.txt
    *** Hello, world.
-   $ curl -F file=@file.txt localhost:3000/entry
+   $ curl --data-binary @file.txt localhost:3000/entry
 
    The endpoint will return the UUID of the file entry if the blob was
    uploaded successfully. This UUID is the only way for the user to
@@ -58,7 +58,8 @@ Update a blob
 
    $ cat file.txt
    *** Hello, world!
-   $ curl -X POST localhost:3000/entry/32805045-857e-451f-bf8a-f32199376a3f
+   $ curl -X POST --data-binary @file.txt \
+         localhost:3000/entry/32805045-857e-451f-bf8a-f32199376a3f
    32805045-857e-451f-bf8a-f32199376a3f
 
    On success, it will return the UUID for the child entry.
